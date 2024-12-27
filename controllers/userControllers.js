@@ -80,10 +80,52 @@ const putUser = async (req, res) => {
 };
 
 //ajout d'une information à un utilisateur
-const patchUser = (req, res) => {
-  res.status(200).json({
-    message: `Ajout des informations dans l'Utilisateur n°${req.params.id}`,
-  });
+const patchUser = async (req, res) => {
+  const { id } = req.params; // ID de l'utilisateur (passé dans l'URL)
+  const { city, district, quarter, township, street, parcelNumber, phone } =
+    req.body;
+
+  try {
+    // Vérifiez si l'utilisateur existe
+    const user = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: `Utilisateur n°${id} introuvable.` });
+    }
+
+    // Ajoutez une nouvelle adresse pour cet utilisateur
+    const userAddress = await prisma.address.create({
+      data: {
+        userId: id,
+        city,
+        district,
+        quarter,
+        township,
+        street,
+        parcelNumber,
+        phone,
+      },
+    });
+
+    res.status(200).json({
+      message: `L'adresse de l'utilisateur n°${id} a été ajoutée.`,
+      address: userAddress,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Une erreur est survenue lors de l'ajout de l'adresse.",
+      error: error.message,
+    });
+  }
+  //676dff681c68fef64e896ec7
+  // res.status(200).json({
+  //   message: `Ajout des informations dans l'Utilisateur n°${req.params.id}`,
+  // });
 };
 
 //suppression d'un uilisateurs unique
