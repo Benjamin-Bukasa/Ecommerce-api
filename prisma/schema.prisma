@@ -29,3 +29,14 @@ model Address {
   userId       String @db.ObjectId
   user         User   @relation(fields: [userId], references: [id]) // Relation avec User
 }
+
+model Product {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  productName    String   @unique
+  productQty     Int
+  productStocked Boolean
+  productDetail  String
+  productPrice   Float
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}

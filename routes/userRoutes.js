@@ -1,5 +1,5 @@
 const express = require("express");
-const Router = express.Router();
+const userRoutes = express.Router();
 const {
   getUsers,
   getUser,
@@ -10,21 +10,21 @@ const {
 } = require("../controllers/userControllers");
 
 //route pour recupérer tous les utilisateurs
-Router.route("/").get(getUsers);
+userRoutes.route("/").get(getUsers);
 
 //route pour récuperer un utilisateur unique
-Router.route("/:id").get(getUser);
+userRoutes.route("/:id").get(getUser);
 
 //route pour ajouter un utilisateur
-Router.route("/").post(postUser);
+userRoutes.route("/").post(postUser);
 
 //route pour  modifier un utilisateur
-Router.route("/:id").put(putUser);
+userRoutes.route("/:id").put(putUser);
 
 //route pour  modifier un utilisateur
-Router.route("/:id").patch(patchUser);
+userRoutes.route("/:id").patch(patchUser);
 
 //route pour  supprimer un utilisateur
-Router.route("/:id").delete(deleteUser);
+userRoutes.route("/:id").delete(deleteUser);
 
-module.exports = Router;
+module.exports = userRoutes;
