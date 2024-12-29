@@ -8,17 +8,20 @@ generator client {
 }
 
 model User {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  email     String    @unique
-  password  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  addresses Address[] // Relation : un utilisateur peut avoir plusieurs adresses possibles
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  email         String          @unique
+  password      String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  addresses     Address[] // Relation avec Address
+  orders        Order[] // Relation avec Order
+  reward        Reward[] // Relation avec Reward, un utilisateur peut avoir plusieurs récompenses
+  LoyalCustomer LoyalCustomer[]
 }
 
 model Address {
-  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
   city         String
   district     String
   quarter      String
@@ -26,17 +29,72 @@ model Address {
   street       String
   parcelNumber String
   phone        String
-  userId       String @db.ObjectId
-  user         User   @relation(fields: [userId], references: [id]) // Relation avec User
+  userId       String  @db.ObjectId
+  user         User    @relation(fields: [userId], references: [id])
+  Order        Order[]
 }
 
 model Product {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  productName    String   @unique
+  id             String      @id @default(auto()) @map("_id") @db.ObjectId
+  productName    String      @unique
   productQty     Int
   productStocked Boolean
   productDetail  String
   productPrice   Float
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  imageUrl       String? // Ajout d'une image pour le produit
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  orderItems     OrderItem[] // Relation avec OrderItem
+}
+
+model Order {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String        @db.ObjectId
+  user        User          @relation(fields: [userId], references: [id])
+  products    OrderItem[] // Relation via OrderItem
+  addressId   String        @db.ObjectId
+  address     Address       @relation(fields: [addressId], references: [id])
+  totalPrice  Float
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  SaleHistory SaleHistory[]
+}
+
+model OrderItem {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  orderId   String  @db.ObjectId
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+}
+
+model SaleHistory {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderId    String   @db.ObjectId
+  order      Order    @relation(fields: [orderId], references: [id])
+  saleDate   DateTime @default(now())
+  totalPrice Float
+}
+
+model Reward {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String          @db.ObjectId
+  user           User            @relation(fields: [userId], references: [id]) // Relation avec l'utilisateur
+  rewardPoints   Int // Points accumulés par l'utilisateur pour ses actions
+  rewardDetails  String? // Détails supplémentaires sur la récompense
+  lastRewardDate DateTime        @default(now()) // Date de la dernière récompense
+  LoyalCustomer  LoyalCustomer[]
+}
+
+model LoyalCustomer {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id])
+  totalSpent  Float // Montant total dépensé par le client
+  totalOrders Int // Nombre total de commandes passées par le client
+  createdAt   DateTime @default(now())
+  rewardId    String?  @db.ObjectId // Lien avec Reward
+  reward      Reward?  @relation(fields: [rewardId], references: [id]) // Relation avec Reward
 }
