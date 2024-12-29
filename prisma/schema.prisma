@@ -14,7 +14,7 @@ model User {
   password  String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  addresses Address[] // Relation : un utilisateur peut avoir plusieurs adresses
+  addresses Address[] // Relation : un utilisateur peut avoir plusieurs adresses possibles
 }
 
 model Address {
